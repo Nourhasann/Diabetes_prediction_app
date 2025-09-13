@@ -213,8 +213,8 @@ print(cm_knn_df)
 """**Decision Tree**"""
 
 from sklearn.tree import DecisionTreeClassifier
+dt = DecisionTreeClassifier(random_state=42, class_weight='balanced')
 
-dt = DecisionTreeClassifier(random_state=42)
 dt.fit(x_train_scaled, y_train) # Train on scaled data
 y_pred_dt = dt.predict(x_test_scaled) # Predict on scaled data
 
@@ -254,17 +254,23 @@ print(cm_gb_df)
 
 input_data = (5,166,72,19,175,25.8,0.587,51)
 
+# Convert to numpy array
 input_data_as_numpy_array = np.asarray(input_data)
 
-input_data_reshaped = input_data_as_numpy_array.reshape(1,-1)
+# Reshape for single sample
+input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
 
-prediction = dt.predict(input_data_reshaped)
+# 🔹 Scale the input (important!)
+input_data_scaled = scaler.transform(input_data_reshaped)
+
+# Predict using the trained Decision Tree model
+prediction = dt.predict(input_data_scaled)
 print(prediction)
 
-if (prediction[0] == 0):
-  print('The person is not diabetic')
+if prediction[0] == 0:
+    print('The person is not diabetic')
 else:
-  print('The person is diabetic')
+    print('The person is diabetic')
 
 """saving the model"""
 
@@ -278,3 +284,12 @@ print(f"Decision Tree model saved as {filename}")
 
 #loading the saved model
 loaded_model = pickle.load(open('decision_tree_model.sav', 'rb'))
+
+import pickle
+
+# Save the scaler object
+filename = 'scaler.sav'
+with open(filename, 'wb') as f:
+    pickle.dump(scaler, f)
+
+print(f"Scaler object saved as {filename}")
